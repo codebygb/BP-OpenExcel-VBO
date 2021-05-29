@@ -1,0 +1,887 @@
+﻿<process name="OpenXML" version="1.0" bpversion="6.10.1.35171" narrative="" byrefcollection="true" type="object" runmode="Exclusive" preferredid="3bf65856-b0d4-4005-b64d-6ed73793b8e6">
+  <appdef>
+    <element name="Application Root">
+      <id>9c641a34-38b1-481a-8f5b-6063edc93144</id>
+      <type>Application</type>
+      <basetype>Application</basetype>
+      <datatype>unknown</datatype>
+      <diagnose>False</diagnose>
+    </element>
+  </appdef>
+  <view>
+    <camerax>0</camerax>
+    <cameray>0</cameray>
+    <zoom version="2">1.25</zoom>
+  </view>
+  <preconditions />
+  <endpoint narrative="" />
+  <subsheet subsheetid="dd2bfdd5-3df4-4d6d-afdf-4c135147faa4" type="CleanUp" published="True">
+    <name>Clean Up</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="2f45728c-84e5-4212-b653-f810abc7f6fe" type="Normal" published="True">
+    <name>Get Worksheet as Collection</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>7</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="68ebce3d-cffd-448b-abe0-7a404e6ffbcd" type="Normal" published="True">
+    <name>Write Collection</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="79545bf9-293b-4fb0-93df-bba38c8e69d2" type="Normal" published="True">
+    <name>Create Workbook</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="edc42d32-1a75-4be8-a1be-f4e8edee2374" type="Normal" published="True">
+    <name>Add Worksheet</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="10e1fd1c-0999-485f-85be-a6c1e281c2ba" type="Normal" published="True">
+    <name>Open Workbook</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="d605eebf-928a-4800-93e5-f4b29672661f" type="Normal" published="False">
+    <name>Get Worksheets</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="50c74c59-b9ca-49ff-a7db-f29c1923e58d" type="Normal" published="False">
+    <name>Set Border</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="efde3c1c-bd1f-4be0-b2f9-3f57bd180bd0" type="Normal" published="True">
+    <name>Close Workbook</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <stage stageid="df0e4d39-bf40-4398-a7c0-aaecf56316ae" name="Start" type="Start">
+    <loginhibit />
+    <display x="15" y="-105" />
+    <onsuccess>96cd6dc0-11f9-4691-9fca-1dc85d5196c7</onsuccess>
+  </stage>
+  <stage stageid="96cd6dc0-11f9-4691-9fca-1dc85d5196c7" name="End" type="End">
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="0423eeb3-3774-414a-8cfa-a9fdfdfaa649" name="Stage1" type="ProcessInfo">
+    <display x="-195" y="-105" w="150" h="90" />
+    <references>
+      <reference>System.dll</reference>
+      <reference>System.Data.dll</reference>
+      <reference>System.Xml.dll</reference>
+      <reference>System.Drawing.dll</reference>
+      <reference>Microsoft.CSharp.dll</reference>
+      <reference>ExcelDataReader.dll</reference>
+      <reference>ExcelDataReader.DataSet.dll</reference>
+      <reference>System.Core.dll</reference>
+      <reference>ClosedXML.dll</reference>
+      <reference>System.Data.DataSetExtensions.dll</reference>
+      <reference>netstandard.dll</reference>
+    </references>
+    <imports>
+      <import>System</import>
+      <import>System.Drawing</import>
+      <import>System.Data</import>
+      <import>ExcelDataReader</import>
+      <import>System.Data</import>
+      <import>System.IO</import>
+      <import>ClosedXML.Excel</import>
+      <import>System.Data.DataSetExtensions</import>
+      <import>System.Collections.Generic</import>
+    </imports>
+    <language>csharp</language>
+    <globalcode><![CDATA[]]></globalcode>
+    <code><![CDATA[public static Dictionary<int, XLWorkbook> WorkbookDict = new Dictionary<int, XLWorkbook>();
+public static int count = 0;
+
+
+private DataTable ExcelReader(string filePath, bool useColumnDataType, bool useHeaderRow,  string sheetName="", int sheetPosition= -1, int headerRow = 0, int fromRow = 0, int fromCol = 0, string password = null)
+{
+	DataTable dt = null;
+	//System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+	using (FileStream stream = File.Open(filePath, FileMode.Open, FileAccess.Read))
+	{
+		var reader = ExcelReaderFactory.CreateReader(stream);
+
+		if (password!=null)
+		{
+			reader = ExcelReaderFactory.CreateReader(stream, new ExcelReaderConfiguration()
+			{
+				// Open password protected workbooks.
+				Password = password
+			});
+		}
+		 
+		var i = 0;
+		var conf = new ExcelDataSetConfiguration()
+		{
+			// Gets or sets a value indicating whether to set the DataColumn.DataType 
+			// property in a second pass.
+			UseColumnDataType = useColumnDataType,
+
+			// Gets or sets a callback to determine whether to include the current sheet
+			// in the DataSet. Called once per sheet before ConfigureDataTable.
+
+			FilterSheet = (tableReader, sheetIndex) => tableReader.VisibleState == "visible" & (sheetIndex == sheetPosition | tableReader.Name.Equals(sheetName)),
+
+			// Gets or sets a callback to obtain configuration options for a DataTable. 
+			ConfigureDataTable = (tableReader) => new ExcelDataTableConfiguration()
+			{
+				// Gets or sets a value indicating the prefix of generated column names.
+				EmptyColumnNamePrefix = "Column",
+
+				// Gets or sets a value indicating whether to use a row from the 
+				// data as column names.
+				UseHeaderRow = useHeaderRow,
+
+				// Gets or sets a callback to determine which row is the header row. 
+				// Only called when UseHeaderRow = true.
+				ReadHeaderRow = (rowReader) =>
+				{
+					// F.ex skip the first row and use the 2nd row as column headers:
+					for (int x = 0; x < headerRow; x++)
+					{
+						rowReader.Read();
+					}
+				},
+
+				// Gets or sets a callback to determine whether to include the 
+				// current row in the DataTable.
+				FilterRow = (rowReader) => fromRow <= ++i - 1,
+				FilterColumn = (rowReader, colIndex) => fromCol <= colIndex,
+
+			}
+		};
+		DataSet result = reader.AsDataSet(conf);
+		dt = result.Tables[0];
+	}
+	return dt;
+}
+
+	
+private void AppendDTtoSheet(string workbook, string worksheet, DataTable table, bool useHeader, int rowNo, int colNo, bool autoFit, bool append=true)
+{
+
+	using (var wb = new XLWorkbook(workbook)){
+	var ws = wb.Worksheet(worksheet);
+	if(append)
+	{
+		rowNo = ws.Column(colNo).LastCellUsed().Address.RowNumber + 1;
+	}
+	if (useHeader)
+	{
+		ws.Cell(rowNo, colNo).InsertTable(table, false);
+	}else 
+	{
+		ws.Cell(rowNo, colNo).InsertData(table);
+	}
+	if(autoFit){ws.Columns().AdjustToContents();}
+	wb.Save();}
+}
+
+private void CreateWB(string filePath, string initialSheet)
+{
+	using(var wb = new XLWorkbook()){
+	if(initialSheet.Trim()==""){wb.Worksheets.Add("Sheet1");}
+	else{wb.Worksheets.Add(initialSheet);}
+	wb.SaveAs(filePath);}
+	
+}
+
+private void AddWorksheet(string filePath, string sheetName)
+{
+	using(var wb = new XLWorkbook(filePath)){
+	wb.Worksheets.Add(sheetName);
+	wb.Save();}
+	
+}
+
+public DataTable GetSheets(string filePath)
+{
+	DataTable table = new DataTable();
+	using(var wb = new XLWorkbook(filePath))
+	{	
+		table.Columns.Add("Index", typeof(int));
+		table.Columns.Add("Name", typeof(string));
+		foreach (IXLWorksheet worksheet in wb.Worksheets)
+		{
+			table.Rows.Add(worksheet.Position, worksheet.Name); 
+		}
+	}
+	return table;
+}
+
+public int OpenWorkbook(string filePath)
+{
+	var wb = new XLWorkbook(filePath);
+	WorkbookDict.Add(++count, wb);
+	return count;
+}
+
+public XLWorkbook GetWorkbook(int index)
+{
+	return WorkbookDict[index];
+}
+
+public IXLWorksheet GetWorksheet(int index, string sheet)
+{
+	return WorkbookDict[index].Worksheet(sheet);
+}
+
+public void CloseWorkbook(int index, bool save)
+{
+	var wb = WorkbookDict[index];
+	if(save){wb.Save();}
+	wb.Dispose();
+	WorkbookDict.Remove(index);
+}
+
+public void Dispose()
+{
+	foreach(var i in WorkbookDict){
+		i.Value.Dispose();
+		WorkbookDict.Remove(i.Key);
+	}
+	WorkbookDict.Clear();
+}
+	]]></code>
+  </stage>
+  <stage stageid="0176404f-47a8-4770-8c8c-e01d8927434b" name="Clean Up" type="SubSheetInfo">
+    <subsheetid>dd2bfdd5-3df4-4d6d-afdf-4c135147faa4</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="0498b517-9f5b-4402-a201-a0bf28b624c7" name="Start" type="Start">
+    <subsheetid>dd2bfdd5-3df4-4d6d-afdf-4c135147faa4</subsheetid>
+    <loginhibit />
+    <display x="15" y="-105" />
+    <onsuccess>0e3d6138-35e3-4680-b888-f28e5c0a8334</onsuccess>
+  </stage>
+  <stage stageid="0e3d6138-35e3-4680-b888-f28e5c0a8334" name="End" type="End">
+    <subsheetid>dd2bfdd5-3df4-4d6d-afdf-4c135147faa4</subsheetid>
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="702f00cd-c911-49e1-9146-8d9af0ee00fe" name="Get Worksheet as Collection" type="SubSheetInfo">
+    <subsheetid>2f45728c-84e5-4212-b653-f810abc7f6fe</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="a464c107-d875-4db1-843b-c4a0e9895154" name="Start" type="Start">
+    <subsheetid>2f45728c-84e5-4212-b653-f810abc7f6fe</subsheetid>
+    <loginhibit />
+    <display x="15" y="-105" />
+    <onsuccess>dd5c7de4-fffb-4173-883d-2e39ce6bcb15</onsuccess>
+  </stage>
+  <stage stageid="c6df13b2-8285-45a0-b8b9-78ca164ad8af" name="End" type="End">
+    <subsheetid>2f45728c-84e5-4212-b653-f810abc7f6fe</subsheetid>
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="7df4cf6d-2884-4a95-b61a-4a7e629668ca" name="Note1" type="Note">
+    <subsheetid>dd2bfdd5-3df4-4d6d-afdf-4c135147faa4</subsheetid>
+    <narrative>Clean Up Page
+
+This is an optional page where you might choose to perform some finalisation (or "cleanup") tasks as your business object is closed down.
+
+The cleanup action will be called automatically immediately after closing your business object at the end of a business process.
+
+You will not be able to call this action from a business process, nor will it be called at any other time than before the disposal of the business object.</narrative>
+    <display x="-180" y="60" w="180" h="230" />
+  </stage>
+  <stage stageid="6e8dc431-16c4-4f1d-bbe6-66f9a5085201" name="Note2" type="Note">
+    <narrative>Initialise Page
+
+This is an optional page where you might choose to perform some initialisation tasks after your business object is loaded.
+
+The initialise action will be called automatically immediately after loading your business object.
+
+You will not be able to call this action from a business process, nor will it be called at any other time than after the creation of the object.</narrative>
+    <display x="-180" y="60" w="180" h="230" />
+  </stage>
+  <stage stageid="dd5c7de4-fffb-4173-883d-2e39ce6bcb15" name="Read to Collection" type="Code">
+    <subsheetid>2f45728c-84e5-4212-b653-f810abc7f6fe</subsheetid>
+    <loginhibit />
+    <display x="15" y="-15" />
+    <inputs>
+      <input type="text" name="filePath" expr="[I_txtfilePath]" />
+      <input type="flag" name="use_column_data_type" expr="[I_flagPredictColumnType]" />
+      <input type="flag" name="use_header_row" expr="[I_flagUseHeaderRow]" />
+      <input type="text" name="sheet_name" expr="[I_txtSheetName]" />
+      <input type="number" name="sheet_position" expr="[I_numSheetIndex]" />
+      <input type="number" name="header_row" expr="[I_numHeaderRow]" />
+      <input type="number" name="from_col" expr="[I_numFromCol]" />
+      <input type="password" name="pass" expr="[I_pwdWB]" />
+      <input type="number" name="from_row" expr="[I_numFromRow]" />
+    </inputs>
+    <outputs>
+      <output type="collection" name="dt" stage="dt" />
+    </outputs>
+    <onsuccess>c6df13b2-8285-45a0-b8b9-78ca164ad8af</onsuccess>
+    <code><![CDATA[if (sheet_name == "")
+{
+	sheet_position = 0;
+}
+if (header_row <= 0)
+{
+	header_row = 0;
+}
+if (from_col <= 0)
+{
+	from_col = 0;
+}
+if (from_row <= 0)
+{
+	from_row = 0;
+}
+if (pass == "")
+{
+	pass = null;
+}
+dt = ExcelReader(filePath, use_column_data_type , use_header_row, sheetName: sheet_name,
+				sheetPosition: (int)sheet_position, headerRow: (int)header_row, fromCol: (int)from_col,
+				fromRow: (int)from_row, password: pass );]]></code>
+  </stage>
+  <stage stageid="c937216b-28b2-415e-a92b-9b00436e453f" name="dt" type="Collection">
+    <subsheetid>2f45728c-84e5-4212-b653-f810abc7f6fe</subsheetid>
+    <display x="180" y="-15" />
+    <datatype>collection</datatype>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="75abf46b-682b-4654-a5f3-65c1c7ed017a" name="I_txtfilePath" type="Data">
+    <subsheetid>2f45728c-84e5-4212-b653-f810abc7f6fe</subsheetid>
+    <display x="-240" y="-15" />
+    <datatype>text</datatype>
+    <initialvalue xml:space="preserve">C:\Users\gopal\Documents\Excel\Temp.xlsx</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="09f1ed45-1c00-4a03-a955-6381ccb67763" name="I_flagPredictColumnType" type="Data">
+    <subsheetid>2f45728c-84e5-4212-b653-f810abc7f6fe</subsheetid>
+    <display x="-240" y="75" />
+    <datatype>flag</datatype>
+    <initialvalue>True</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="f5891e27-a72a-488d-9455-48655cfb0b40" name="I_txtSheetName" type="Data">
+    <subsheetid>2f45728c-84e5-4212-b653-f810abc7f6fe</subsheetid>
+    <display x="-240" y="30" />
+    <datatype>text</datatype>
+    <initialvalue xml:space="preserve">Sheet1</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="8827e1fe-70f2-435f-8772-5bc183664544" name="I_numSheetIndex" type="Data">
+    <subsheetid>2f45728c-84e5-4212-b653-f810abc7f6fe</subsheetid>
+    <display x="-240" y="120" />
+    <datatype>number</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="b8ce6597-9f88-405d-9aa6-80d2fc57fe5c" name="I_numHeaderRow" type="Data">
+    <subsheetid>2f45728c-84e5-4212-b653-f810abc7f6fe</subsheetid>
+    <display x="-165" y="75" />
+    <datatype>number</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="80c479bd-d567-439e-8b8f-2c0199cc496a" name="I_numFromCol" type="Data">
+    <subsheetid>2f45728c-84e5-4212-b653-f810abc7f6fe</subsheetid>
+    <display x="-165" y="30" />
+    <datatype>number</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="c0f8c26e-4c05-43a1-b6e8-a63a6fa44a46" name="I_numFromRow" type="Data">
+    <subsheetid>2f45728c-84e5-4212-b653-f810abc7f6fe</subsheetid>
+    <display x="-165" y="120" />
+    <datatype>number</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="86f09bde-bbe6-4db6-be5c-cb1dc979f2bb" name="I_pwdWB" type="Data">
+    <subsheetid>2f45728c-84e5-4212-b653-f810abc7f6fe</subsheetid>
+    <display x="-240" y="165" />
+    <datatype>password</datatype>
+    <initialvalueenc>
+    </initialvalueenc>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="dffcbf2e-b514-44fe-9f09-f5f21fea19a2" name="Write Collection" type="SubSheetInfo">
+    <subsheetid>68ebce3d-cffd-448b-abe0-7a404e6ffbcd</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="c6a9b241-d809-4aa3-a819-bc5f65f1fd80" name="Start" type="Start">
+    <subsheetid>68ebce3d-cffd-448b-abe0-7a404e6ffbcd</subsheetid>
+    <loginhibit />
+    <display x="15" y="-105" />
+    <onsuccess>5b2463a9-3516-4e77-9e22-1d5bf5ae9e8a</onsuccess>
+  </stage>
+  <stage stageid="3d66d32c-de9d-4ab3-be2e-57cc61d06f79" name="End" type="End">
+    <subsheetid>68ebce3d-cffd-448b-abe0-7a404e6ffbcd</subsheetid>
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="5b2463a9-3516-4e77-9e22-1d5bf5ae9e8a" name="Write Collection to Sheet" type="Code">
+    <subsheetid>68ebce3d-cffd-448b-abe0-7a404e6ffbcd</subsheetid>
+    <loginhibit />
+    <display x="15" y="-15" />
+    <inputs>
+      <input type="text" name="filePath" expr="[I_txtfilePath]" />
+      <input type="text" name="sheetName" expr="[I_txtSheetName]" />
+      <input type="collection" name="table" expr="[I_collData]" />
+      <input type="number" name="fromCol" expr="[I_numFromCol]" />
+      <input type="number" name="fromRow" expr="[I_numFromRow]" />
+      <input type="flag" name="append" expr="[I_flagAppend]" />
+      <input type="flag" name="useHeader" expr="[I_flagUseHeaderRow]" />
+      <input type="flag" name="autofit" expr="[I_flagAutoFit]" />
+    </inputs>
+    <onsuccess>3d66d32c-de9d-4ab3-be2e-57cc61d06f79</onsuccess>
+    <code><![CDATA[AppendDTtoSheet(filePath, sheetName, table, useHeader, (int)fromRow, (int)fromCol, autofit, append);]]></code>
+  </stage>
+  <stage stageid="693936d7-42bb-4ca5-b31b-ee223dcd1c15" name="Create Workbook" type="SubSheetInfo">
+    <subsheetid>79545bf9-293b-4fb0-93df-bba38c8e69d2</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="04a6a14b-c9b3-46fb-bed0-81a4ba21ef17" name="Start" type="Start">
+    <subsheetid>79545bf9-293b-4fb0-93df-bba38c8e69d2</subsheetid>
+    <loginhibit />
+    <display x="15" y="-105" />
+    <onsuccess>622f896e-1ab7-47d1-bbec-d0f61af6a1e8</onsuccess>
+  </stage>
+  <stage stageid="19edccc4-29e2-4049-ac8d-e17e3d10d425" name="End" type="End">
+    <subsheetid>79545bf9-293b-4fb0-93df-bba38c8e69d2</subsheetid>
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="622f896e-1ab7-47d1-bbec-d0f61af6a1e8" name="Create WB" type="Code">
+    <subsheetid>79545bf9-293b-4fb0-93df-bba38c8e69d2</subsheetid>
+    <loginhibit />
+    <display x="15" y="-15" />
+    <inputs>
+      <input type="text" name="filePath" expr="[I_txtfilePath]" />
+      <input type="text" name="workSheet" expr="[I_txtSheetName]" />
+    </inputs>
+    <onsuccess>19edccc4-29e2-4049-ac8d-e17e3d10d425</onsuccess>
+    <code><![CDATA[CreateWB(filePath,workSheet);]]></code>
+  </stage>
+  <stage stageid="7cfdaa5a-85ca-412c-af41-f7ea037bcfb4" name="I_txtfilePath" type="Data">
+    <subsheetid>79545bf9-293b-4fb0-93df-bba38c8e69d2</subsheetid>
+    <display x="-240" y="-15" />
+    <datatype>text</datatype>
+    <initialvalue xml:space="preserve">C:\Users\gopal\Documents\Excel\Temp.xlsx</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="0d5048cd-6c99-4d95-a950-420563c00604" name="I_txtSheetName" type="Data">
+    <subsheetid>79545bf9-293b-4fb0-93df-bba38c8e69d2</subsheetid>
+    <display x="-180" y="-15" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="073121c6-66db-4ecc-8870-6c2743313c26" name="I_txtfilePath" type="Data">
+    <subsheetid>68ebce3d-cffd-448b-abe0-7a404e6ffbcd</subsheetid>
+    <display x="-240" y="-15" />
+    <datatype>text</datatype>
+    <initialvalue xml:space="preserve">C:\Users\gopal\Documents\Excel\Temp.xlsx</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="81cdfb68-c883-4a86-b4af-d26c68f57b74" name="I_txtSheetName" type="Data">
+    <subsheetid>68ebce3d-cffd-448b-abe0-7a404e6ffbcd</subsheetid>
+    <display x="-180" y="-15" />
+    <datatype>text</datatype>
+    <initialvalue xml:space="preserve">Sheet1</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="356a07d0-9521-4b77-bf4b-bc56a9076c93" name="I_collData" type="Collection">
+    <subsheetid>68ebce3d-cffd-448b-abe0-7a404e6ffbcd</subsheetid>
+    <display x="90" y="-15" />
+    <datatype>collection</datatype>
+    <private />
+    <alwaysinit />
+    <collectioninfo>
+      <field name="Field1" type="number" />
+      <field name="Field2" type="text" />
+      <field name="Field3" type="text" />
+    </collectioninfo>
+    <initialvalue>
+      <row>
+        <field name="Field1" type="number" value="1" />
+        <field name="Field2" type="text" value="sdsd" />
+        <field name="Field3" type="text" value="sdsd" />
+      </row>
+    </initialvalue>
+  </stage>
+  <stage stageid="f345d635-9086-4165-8dab-073c9d79a894" name="I_flagUseHeaderRow" type="Data">
+    <subsheetid>68ebce3d-cffd-448b-abe0-7a404e6ffbcd</subsheetid>
+    <display x="-240" y="135" />
+    <datatype>flag</datatype>
+    <initialvalue>False</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="012b34e3-160d-4657-8528-70396ad4f087" name="I_numFromCol" type="Data">
+    <subsheetid>68ebce3d-cffd-448b-abe0-7a404e6ffbcd</subsheetid>
+    <display x="-240" y="60" />
+    <datatype>number</datatype>
+    <initialvalue>1</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="7e613f4f-e9e3-4242-b146-f18d890dff37" name="I_numFromRow" type="Data">
+    <subsheetid>68ebce3d-cffd-448b-abe0-7a404e6ffbcd</subsheetid>
+    <display x="-180" y="60" />
+    <datatype>number</datatype>
+    <initialvalue>1</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="fce2d497-13e0-4879-80bd-34cd593dccc2" name="I_flagAppend" type="Data">
+    <subsheetid>68ebce3d-cffd-448b-abe0-7a404e6ffbcd</subsheetid>
+    <display x="-120" y="135" />
+    <datatype>flag</datatype>
+    <initialvalue>True</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="1a47bb57-db55-4658-a113-f1b2e3672ff6" name="I_flagUseHeaderRow" type="Data">
+    <subsheetid>2f45728c-84e5-4212-b653-f810abc7f6fe</subsheetid>
+    <display x="-165" y="-15" />
+    <datatype>flag</datatype>
+    <initialvalue>True</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="605a379c-badb-4e8b-b7df-d491a584cacb" name="Add Worksheet" type="SubSheetInfo">
+    <subsheetid>edc42d32-1a75-4be8-a1be-f4e8edee2374</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="97808d54-2909-4993-89c3-263868a206c7" name="Start" type="Start">
+    <subsheetid>edc42d32-1a75-4be8-a1be-f4e8edee2374</subsheetid>
+    <loginhibit />
+    <display x="15" y="-105" />
+    <onsuccess>500c1673-a1d6-4d8b-9a06-cff7c88f7d33</onsuccess>
+  </stage>
+  <stage stageid="e762c708-6878-4a97-a7d0-b028ddda5a18" name="End" type="End">
+    <subsheetid>edc42d32-1a75-4be8-a1be-f4e8edee2374</subsheetid>
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="500c1673-a1d6-4d8b-9a06-cff7c88f7d33" name="Add Worksheet" type="Code">
+    <subsheetid>edc42d32-1a75-4be8-a1be-f4e8edee2374</subsheetid>
+    <loginhibit />
+    <display x="15" y="-15" />
+    <inputs>
+      <input type="text" name="filePath" expr="[I_txtfilePath]" />
+      <input type="text" name="workSheet" expr="[I_txtSheetName]" />
+    </inputs>
+    <onsuccess>e762c708-6878-4a97-a7d0-b028ddda5a18</onsuccess>
+    <code><![CDATA[AddWorksheet(filePath,workSheet);]]></code>
+  </stage>
+  <stage stageid="60d30e65-2a7e-49c2-b6e9-a8a0b503e0ac" name="I_txtfilePath" type="Data">
+    <subsheetid>edc42d32-1a75-4be8-a1be-f4e8edee2374</subsheetid>
+    <display x="-225" y="0" />
+    <datatype>text</datatype>
+    <initialvalue xml:space="preserve">C:\Users\gopal\Documents\Excel\Temp.xlsx</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="423c49e1-a7a6-4669-9b34-4afd21b2d055" name="I_txtSheetName" type="Data">
+    <subsheetid>edc42d32-1a75-4be8-a1be-f4e8edee2374</subsheetid>
+    <display x="-165" y="0" />
+    <datatype>text</datatype>
+    <initialvalue xml:space="preserve">Go</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="bbadf939-beda-4910-8007-af50ebf8c7d9" name="Open Workbook" type="SubSheetInfo">
+    <subsheetid>10e1fd1c-0999-485f-85be-a6c1e281c2ba</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="402f83b0-cb47-47cc-8661-f1732e463ec4" name="Start" type="Start">
+    <subsheetid>10e1fd1c-0999-485f-85be-a6c1e281c2ba</subsheetid>
+    <loginhibit />
+    <display x="15" y="-105" />
+    <onsuccess>915e6f25-e52c-4fc1-b10e-95317391d8b5</onsuccess>
+  </stage>
+  <stage stageid="58b92b36-74a3-443d-91d8-e7327668f185" name="End" type="End">
+    <subsheetid>10e1fd1c-0999-485f-85be-a6c1e281c2ba</subsheetid>
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="676692f6-a6ec-407a-aaf2-7a74d940a288" name="I_flagAutoFit" type="Data">
+    <subsheetid>68ebce3d-cffd-448b-abe0-7a404e6ffbcd</subsheetid>
+    <display x="-180" y="135" />
+    <datatype>flag</datatype>
+    <initialvalue>True</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="915e6f25-e52c-4fc1-b10e-95317391d8b5" name="Open WB" type="Code">
+    <subsheetid>10e1fd1c-0999-485f-85be-a6c1e281c2ba</subsheetid>
+    <loginhibit />
+    <display x="15" y="-15" />
+    <inputs>
+      <input type="text" name="filePath" expr="[I_txtfilePath]" />
+    </inputs>
+    <outputs>
+      <output type="number" name="index" stage="O_numIndex" />
+    </outputs>
+    <onsuccess>58b92b36-74a3-443d-91d8-e7327668f185</onsuccess>
+    <code><![CDATA[index = OpenWorkbook(filePath);]]></code>
+  </stage>
+  <stage stageid="a18986a8-86de-4e8d-8379-a8908fdb68fc" name="O_numIndex" type="Data">
+    <subsheetid>10e1fd1c-0999-485f-85be-a6c1e281c2ba</subsheetid>
+    <display x="-165" y="-15" />
+    <datatype>number</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="688c47ca-7e56-4d04-bedd-615fbdeaf09a" name="Get Worksheets" type="SubSheetInfo">
+    <subsheetid>d605eebf-928a-4800-93e5-f4b29672661f</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="44e32273-8e68-485c-be09-79a77522b5db" name="Start" type="Start">
+    <subsheetid>d605eebf-928a-4800-93e5-f4b29672661f</subsheetid>
+    <loginhibit />
+    <display x="15" y="-105" />
+    <onsuccess>a6cbf6c1-3cd3-4bc8-8bf8-a03de7e37a2a</onsuccess>
+  </stage>
+  <stage stageid="d12b7176-6acd-48ab-b498-d6f4e5910731" name="End" type="End">
+    <subsheetid>d605eebf-928a-4800-93e5-f4b29672661f</subsheetid>
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="a6cbf6c1-3cd3-4bc8-8bf8-a03de7e37a2a" name="Code2" type="Code">
+    <subsheetid>d605eebf-928a-4800-93e5-f4b29672661f</subsheetid>
+    <loginhibit />
+    <display x="15" y="-15" />
+    <inputs>
+      <input type="text" name="filePath" expr="[I_txtfilePath]" />
+    </inputs>
+    <outputs>
+      <output type="collection" name="dt" stage="dt" />
+    </outputs>
+    <onsuccess>d12b7176-6acd-48ab-b498-d6f4e5910731</onsuccess>
+    <code><![CDATA[dt = GetSheets(filePath);]]></code>
+  </stage>
+  <stage stageid="f623d639-3270-4782-835e-4cf554d3281a" name="dt" type="Collection">
+    <subsheetid>d605eebf-928a-4800-93e5-f4b29672661f</subsheetid>
+    <display x="-165" y="-15" />
+    <datatype>collection</datatype>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="101a7872-cb85-4c8d-84bd-d4b29e593184" name="Close Workbook" type="SubSheetInfo">
+    <subsheetid>efde3c1c-bd1f-4be0-b2f9-3f57bd180bd0</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="bb0db647-7177-48d4-8587-d94316a9dda0" name="Start" type="Start">
+    <subsheetid>efde3c1c-bd1f-4be0-b2f9-3f57bd180bd0</subsheetid>
+    <loginhibit />
+    <display x="15" y="-105" />
+    <onsuccess>6140e095-6b0d-4126-afeb-ebceff644b94</onsuccess>
+  </stage>
+  <stage stageid="bc473c7a-8150-4135-94e2-d70ea80520cc" name="End" type="End">
+    <subsheetid>efde3c1c-bd1f-4be0-b2f9-3f57bd180bd0</subsheetid>
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="6140e095-6b0d-4126-afeb-ebceff644b94" name="Close Workbook" type="Code">
+    <subsheetid>efde3c1c-bd1f-4be0-b2f9-3f57bd180bd0</subsheetid>
+    <loginhibit />
+    <display x="15" y="-15" />
+    <inputs>
+      <input type="number" name="index" expr="[I_numIndex]" />
+      <input type="flag" name="save" expr="[I_flagSave]" />
+    </inputs>
+    <onsuccess>bc473c7a-8150-4135-94e2-d70ea80520cc</onsuccess>
+    <code><![CDATA[CloseWorkbook((int)index,save);]]></code>
+  </stage>
+  <stage stageid="ae842281-d49c-4981-81b8-ab9dd8b66d4e" name="I_txtfilePath" type="Data">
+    <subsheetid>10e1fd1c-0999-485f-85be-a6c1e281c2ba</subsheetid>
+    <display x="-225" y="-15" />
+    <datatype>text</datatype>
+    <initialvalue xml:space="preserve">C:\Users\gopal\Documents\Excel\Temp.xlsx</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="ecc2bacf-56fa-40af-9db4-2c937a9fc742" name="Set Border" type="SubSheetInfo">
+    <subsheetid>50c74c59-b9ca-49ff-a7db-f29c1923e58d</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="5994c698-96c7-46cb-8af4-5573b2539e36" name="Start" type="Start">
+    <subsheetid>50c74c59-b9ca-49ff-a7db-f29c1923e58d</subsheetid>
+    <loginhibit />
+    <display x="15" y="-105" />
+    <onsuccess>2ff82e9a-29b3-4f02-bd68-530e8342fd5a</onsuccess>
+  </stage>
+  <stage stageid="26dd7ef9-8f43-45cc-b42f-e1dc10b76715" name="End" type="End">
+    <subsheetid>50c74c59-b9ca-49ff-a7db-f29c1923e58d</subsheetid>
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="4e5403b1-b580-452f-9fd3-d3bcea16f1f0" name="I_txtfilePath" type="Data">
+    <subsheetid>d605eebf-928a-4800-93e5-f4b29672661f</subsheetid>
+    <display x="-225" y="-15" />
+    <datatype>text</datatype>
+    <initialvalue xml:space="preserve">C:\Users\gopal\Documents\Excel\Temp.xlsx</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="2ff82e9a-29b3-4f02-bd68-530e8342fd5a" name="Set Border" type="Code">
+    <subsheetid>50c74c59-b9ca-49ff-a7db-f29c1923e58d</subsheetid>
+    <loginhibit />
+    <display x="15" y="-15" />
+    <inputs>
+      <input type="number" name="index" expr="[I_numIndex]" />
+      <input type="text" name="where" expr="[I_txtWhere]" />
+      <input type="number" name="style" expr="[I_numStyle]" />
+      <input type="text" name="sheet" expr="[I_txtSheetName]" />
+    </inputs>
+    <onsuccess>26dd7ef9-8f43-45cc-b42f-e1dc10b76715</onsuccess>
+    <code><![CDATA[// public enum XLBorderStyleValues
+//{
+//    DashDot = 0,
+//    DashDotDot = 1,
+//    Dashed = 2,
+//    Dotted = 3,
+//    Double = 4,
+//    Hair = 5,
+//    Medium = 6,
+//    MediumDashDot = 7,
+//    MediumDashDotDot = 8,
+//    MediumDashed = 9,
+//    None = 10,
+//    SlantDashDot = 11,
+//    Thick = 12,
+//    Thin = 13
+//}
+XLBorderStyleValues styleVal = (XLBorderStyleValues)style;
+switch (where)
+{
+	case "Left":
+		GetWorksheet((int)index,sheet).RangeUsed().Style.Border.SetLeftBorder(styleVal);
+		break;
+
+	case "Right":
+		GetWorksheet((int)index,sheet).RangeUsed().Style.Border.SetRightBorder(styleVal);
+		break;
+
+	case "Top":
+		GetWorksheet((int)index,sheet).RangeUsed().Style.Border.SetTopBorder(styleVal);
+		break;
+		
+	case "Bottom":
+		GetWorksheet((int)index,sheet).RangeUsed().Style.Border.SetBottomBorder(styleVal);
+		break;
+	
+	case "Inside":
+		GetWorksheet((int)index,sheet).RangeUsed().Style.Border.SetInsideBorder(styleVal);
+		break;
+	
+	case "Outside":
+		GetWorksheet((int)index,sheet).RangeUsed().Style.Border.SetOutsideBorder(styleVal);
+		break;
+		
+	default:
+		GetWorksheet((int)index,sheet).RangeUsed().Style.Border.SetOutsideBorder(styleVal);
+		GetWorksheet((int)index,sheet).RangeUsed().Style.Border.SetInsideBorder(styleVal);
+		break;
+}
+//var wb = GetWorkbook(index)
+
+]]></code>
+  </stage>
+  <stage stageid="02e04f60-c8c5-463a-9cd2-f992b96aec57" name="I_numIndex" type="Data">
+    <subsheetid>50c74c59-b9ca-49ff-a7db-f29c1923e58d</subsheetid>
+    <display x="-225" y="0" />
+    <datatype>number</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="cad0b99e-bf53-4718-949e-4dbbf0700d49" name="I_numStyle" type="Data">
+    <subsheetid>50c74c59-b9ca-49ff-a7db-f29c1923e58d</subsheetid>
+    <display x="-150" y="0" />
+    <datatype>number</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="7ae510d3-50cc-4b11-9fb6-718ea82a63fc" name="I_txtWhere" type="Data">
+    <subsheetid>50c74c59-b9ca-49ff-a7db-f29c1923e58d</subsheetid>
+    <display x="-225" y="45" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="168eb1de-9b3f-4d7e-9071-a62abab2f1e3" name="I_txtSheetName" type="Data">
+    <subsheetid>50c74c59-b9ca-49ff-a7db-f29c1923e58d</subsheetid>
+    <display x="-150" y="45" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="78468121-1455-4a93-af85-dabf5a2b8a06" name="I_numIndex" type="Data">
+    <subsheetid>efde3c1c-bd1f-4be0-b2f9-3f57bd180bd0</subsheetid>
+    <display x="-165" y="-15" />
+    <datatype>number</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="220dff42-316d-4cd1-bd6c-51cfa355170f" name="I_flagSave" type="Data">
+    <subsheetid>efde3c1c-bd1f-4be0-b2f9-3f57bd180bd0</subsheetid>
+    <display x="-225" y="-15" />
+    <datatype>flag</datatype>
+    <initialvalue>True</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+</process>

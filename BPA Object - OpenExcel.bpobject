@@ -1,4 +1,4 @@
-﻿<process name="OpenXML" version="1.0" bpversion="6.10.1.35171" narrative="" byrefcollection="true" type="object" runmode="Exclusive" preferredid="3bf65856-b0d4-4005-b64d-6ed73793b8e6">
+﻿<process name="OpenExcel" version="1.0" bpversion="6.10.1.35171" narrative="" byrefcollection="true" type="object" runmode="Exclusive" preferredid="3bf65856-b0d4-4005-b64d-6ed73793b8e6">
   <appdef>
     <element name="Application Root">
       <id>9c641a34-38b1-481a-8f5b-6063edc93144</id>
@@ -63,8 +63,16 @@
       <zoom version="2">1.25</zoom>
     </view>
   </subsheet>
-  <subsheet subsheetid="d605eebf-928a-4800-93e5-f4b29672661f" type="Normal" published="False">
+  <subsheet subsheetid="d605eebf-928a-4800-93e5-f4b29672661f" type="Normal" published="True">
     <name>Get Worksheets</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="95825834-839d-49b9-82af-094773fab01b" type="Normal" published="True">
+    <name>Update Pivot Criteria</name>
     <view>
       <camerax>0</camerax>
       <cameray>0</cameray>
@@ -107,9 +115,8 @@
       <reference>ExcelDataReader.dll</reference>
       <reference>ExcelDataReader.DataSet.dll</reference>
       <reference>System.Core.dll</reference>
-      <reference>ClosedXML.dll</reference>
       <reference>System.Data.DataSetExtensions.dll</reference>
-      <reference>netstandard.dll</reference>
+      <reference>C:\Program Files\Blue Prism Limited\Blue Prism Automate\ClosedXML.dll</reference>
     </references>
     <imports>
       <import>System</import>
@@ -247,7 +254,8 @@ public DataTable GetSheets(string filePath)
 public int OpenWorkbook(string filePath)
 {
 	var wb = new XLWorkbook(filePath);
-	WorkbookDict.Add(++count, wb);
+	count = count + 1;
+	WorkbookDict.Add(count, wb);
 	return count;
 }
 
@@ -259,6 +267,26 @@ public XLWorkbook GetWorkbook(int index)
 public IXLWorksheet GetWorksheet(int index, string sheet)
 {
 	return WorkbookDict[index].Worksheet(sheet);
+}
+
+public DataTable GetSheets2(int index)
+{
+	DataTable table = new DataTable();
+
+	table.Columns.Add("Index", typeof(int));
+	table.Columns.Add("Name", typeof(string));
+	foreach (IXLWorksheet worksheet in WorkbookDict[index].Worksheets)
+	{
+		table.Rows.Add(worksheet.Position, worksheet.Name); 
+	}
+
+	return table;
+}
+
+public void UpdatePivotCriteria(int index, string sheetName, string pivotTable, string pivotField, string criteria)
+{	
+	var wb = WorkbookDict[index];
+	wb.Worksheet(sheetName).PivotTable(pivotTable).ReportFilters.Get(pivotField).AddSelectedValue(criteria);
 }
 
 public void CloseWorkbook(int index, bool save)
@@ -384,7 +412,7 @@ dt = ExcelReader(filePath, use_column_data_type , use_header_row, sheetName: she
     <subsheetid>2f45728c-84e5-4212-b653-f810abc7f6fe</subsheetid>
     <display x="-240" y="-15" />
     <datatype>text</datatype>
-    <initialvalue xml:space="preserve">C:\Users\gopal\Documents\Excel\Temp.xlsx</initialvalue>
+    <initialvalue />
     <private />
     <alwaysinit />
   </stage>
@@ -400,7 +428,7 @@ dt = ExcelReader(filePath, use_column_data_type , use_header_row, sheetName: she
     <subsheetid>2f45728c-84e5-4212-b653-f810abc7f6fe</subsheetid>
     <display x="-240" y="30" />
     <datatype>text</datatype>
-    <initialvalue xml:space="preserve">Sheet1</initialvalue>
+    <initialvalue />
     <private />
     <alwaysinit />
   </stage>
@@ -453,6 +481,16 @@ dt = ExcelReader(filePath, use_column_data_type , use_header_row, sheetName: she
     <subsheetid>68ebce3d-cffd-448b-abe0-7a404e6ffbcd</subsheetid>
     <loginhibit />
     <display x="15" y="-105" />
+    <inputs>
+      <input type="collection" name="CollectionToWrite" stage="I_collData" />
+      <input type="flag" name="Append?" stage="I_flagAppend" />
+      <input type="flag" name="AutoFit?" stage="I_flagAutoFit" />
+      <input type="flag" name="HeaderRow?" stage="I_flagUseHeaderRow" />
+      <input type="number" name="ColStart" stage="I_numFromCol" />
+      <input type="number" name="RowStart" stage="I_numFromRow" />
+      <input type="text" name="File" stage="I_txtfilePath" />
+      <input type="text" name="Sheet" stage="I_txtSheetName" />
+    </inputs>
     <onsuccess>5b2463a9-3516-4e77-9e22-1d5bf5ae9e8a</onsuccess>
   </stage>
   <stage stageid="3d66d32c-de9d-4ab3-be2e-57cc61d06f79" name="End" type="End">
@@ -485,6 +523,10 @@ dt = ExcelReader(filePath, use_column_data_type , use_header_row, sheetName: she
     <subsheetid>79545bf9-293b-4fb0-93df-bba38c8e69d2</subsheetid>
     <loginhibit />
     <display x="15" y="-105" />
+    <inputs>
+      <input type="text" name="FilePath" stage="I_txtfilePath" />
+      <input type="text" name="Sheet" stage="I_txtSheetName" />
+    </inputs>
     <onsuccess>622f896e-1ab7-47d1-bbec-d0f61af6a1e8</onsuccess>
   </stage>
   <stage stageid="19edccc4-29e2-4049-ac8d-e17e3d10d425" name="End" type="End">
@@ -507,7 +549,7 @@ dt = ExcelReader(filePath, use_column_data_type , use_header_row, sheetName: she
     <subsheetid>79545bf9-293b-4fb0-93df-bba38c8e69d2</subsheetid>
     <display x="-240" y="-15" />
     <datatype>text</datatype>
-    <initialvalue xml:space="preserve">C:\Users\gopal\Documents\Excel\Temp.xlsx</initialvalue>
+    <initialvalue />
     <private />
     <alwaysinit />
   </stage>
@@ -523,7 +565,7 @@ dt = ExcelReader(filePath, use_column_data_type , use_header_row, sheetName: she
     <subsheetid>68ebce3d-cffd-448b-abe0-7a404e6ffbcd</subsheetid>
     <display x="-240" y="-15" />
     <datatype>text</datatype>
-    <initialvalue xml:space="preserve">C:\Users\gopal\Documents\Excel\Temp.xlsx</initialvalue>
+    <initialvalue />
     <private />
     <alwaysinit />
   </stage>
@@ -531,7 +573,7 @@ dt = ExcelReader(filePath, use_column_data_type , use_header_row, sheetName: she
     <subsheetid>68ebce3d-cffd-448b-abe0-7a404e6ffbcd</subsheetid>
     <display x="-180" y="-15" />
     <datatype>text</datatype>
-    <initialvalue xml:space="preserve">Sheet1</initialvalue>
+    <initialvalue />
     <private />
     <alwaysinit />
   </stage>
@@ -541,18 +583,6 @@ dt = ExcelReader(filePath, use_column_data_type , use_header_row, sheetName: she
     <datatype>collection</datatype>
     <private />
     <alwaysinit />
-    <collectioninfo>
-      <field name="Field1" type="number" />
-      <field name="Field2" type="text" />
-      <field name="Field3" type="text" />
-    </collectioninfo>
-    <initialvalue>
-      <row>
-        <field name="Field1" type="number" value="1" />
-        <field name="Field2" type="text" value="sdsd" />
-        <field name="Field3" type="text" value="sdsd" />
-      </row>
-    </initialvalue>
   </stage>
   <stage stageid="f345d635-9086-4165-8dab-073c9d79a894" name="I_flagUseHeaderRow" type="Data">
     <subsheetid>68ebce3d-cffd-448b-abe0-7a404e6ffbcd</subsheetid>
@@ -566,7 +596,7 @@ dt = ExcelReader(filePath, use_column_data_type , use_header_row, sheetName: she
     <subsheetid>68ebce3d-cffd-448b-abe0-7a404e6ffbcd</subsheetid>
     <display x="-240" y="60" />
     <datatype>number</datatype>
-    <initialvalue>1</initialvalue>
+    <initialvalue />
     <private />
     <alwaysinit />
   </stage>
@@ -574,7 +604,7 @@ dt = ExcelReader(filePath, use_column_data_type , use_header_row, sheetName: she
     <subsheetid>68ebce3d-cffd-448b-abe0-7a404e6ffbcd</subsheetid>
     <display x="-180" y="60" />
     <datatype>number</datatype>
-    <initialvalue>1</initialvalue>
+    <initialvalue />
     <private />
     <alwaysinit />
   </stage>
@@ -602,6 +632,10 @@ dt = ExcelReader(filePath, use_column_data_type , use_header_row, sheetName: she
     <subsheetid>edc42d32-1a75-4be8-a1be-f4e8edee2374</subsheetid>
     <loginhibit />
     <display x="15" y="-105" />
+    <inputs>
+      <input type="text" name="FilePath" stage="I_txtfilePath" />
+      <input type="text" name="SheetName" stage="I_txtSheetName" />
+    </inputs>
     <onsuccess>500c1673-a1d6-4d8b-9a06-cff7c88f7d33</onsuccess>
   </stage>
   <stage stageid="e762c708-6878-4a97-a7d0-b028ddda5a18" name="End" type="End">
@@ -624,7 +658,7 @@ dt = ExcelReader(filePath, use_column_data_type , use_header_row, sheetName: she
     <subsheetid>edc42d32-1a75-4be8-a1be-f4e8edee2374</subsheetid>
     <display x="-225" y="0" />
     <datatype>text</datatype>
-    <initialvalue xml:space="preserve">C:\Users\gopal\Documents\Excel\Temp.xlsx</initialvalue>
+    <initialvalue />
     <private />
     <alwaysinit />
   </stage>
@@ -632,7 +666,7 @@ dt = ExcelReader(filePath, use_column_data_type , use_header_row, sheetName: she
     <subsheetid>edc42d32-1a75-4be8-a1be-f4e8edee2374</subsheetid>
     <display x="-165" y="0" />
     <datatype>text</datatype>
-    <initialvalue xml:space="preserve">Go</initialvalue>
+    <initialvalue />
     <private />
     <alwaysinit />
   </stage>
@@ -644,12 +678,18 @@ dt = ExcelReader(filePath, use_column_data_type , use_header_row, sheetName: she
     <subsheetid>10e1fd1c-0999-485f-85be-a6c1e281c2ba</subsheetid>
     <loginhibit />
     <display x="15" y="-105" />
+    <inputs>
+      <input type="text" name="WorkbookPath" stage="I_txtfilePath" />
+    </inputs>
     <onsuccess>915e6f25-e52c-4fc1-b10e-95317391d8b5</onsuccess>
   </stage>
   <stage stageid="58b92b36-74a3-443d-91d8-e7327668f185" name="End" type="End">
     <subsheetid>10e1fd1c-0999-485f-85be-a6c1e281c2ba</subsheetid>
     <loginhibit />
     <display x="15" y="90" />
+    <outputs>
+      <output type="number" name="Index" stage="O_numIndex" />
+    </outputs>
   </stage>
   <stage stageid="676692f6-a6ec-407a-aaf2-7a74d940a288" name="I_flagAutoFit" type="Data">
     <subsheetid>68ebce3d-cffd-448b-abe0-7a404e6ffbcd</subsheetid>
@@ -688,25 +728,31 @@ dt = ExcelReader(filePath, use_column_data_type , use_header_row, sheetName: she
     <subsheetid>d605eebf-928a-4800-93e5-f4b29672661f</subsheetid>
     <loginhibit />
     <display x="15" y="-105" />
+    <inputs>
+      <input type="number" name="Index" stage="I_numIndex" />
+    </inputs>
     <onsuccess>a6cbf6c1-3cd3-4bc8-8bf8-a03de7e37a2a</onsuccess>
   </stage>
   <stage stageid="d12b7176-6acd-48ab-b498-d6f4e5910731" name="End" type="End">
     <subsheetid>d605eebf-928a-4800-93e5-f4b29672661f</subsheetid>
     <loginhibit />
     <display x="15" y="90" />
+    <outputs>
+      <output type="collection" name="Worksheets" stage="dt" />
+    </outputs>
   </stage>
-  <stage stageid="a6cbf6c1-3cd3-4bc8-8bf8-a03de7e37a2a" name="Code2" type="Code">
+  <stage stageid="a6cbf6c1-3cd3-4bc8-8bf8-a03de7e37a2a" name="Get Worksheets as Collection" type="Code">
     <subsheetid>d605eebf-928a-4800-93e5-f4b29672661f</subsheetid>
     <loginhibit />
     <display x="15" y="-15" />
     <inputs>
-      <input type="text" name="filePath" expr="[I_txtfilePath]" />
+      <input type="number" name="index" expr="[I_numIndex]" />
     </inputs>
     <outputs>
       <output type="collection" name="dt" stage="dt" />
     </outputs>
     <onsuccess>d12b7176-6acd-48ab-b498-d6f4e5910731</onsuccess>
-    <code><![CDATA[dt = GetSheets(filePath);]]></code>
+    <code><![CDATA[dt = GetSheets2((int)index);]]></code>
   </stage>
   <stage stageid="f623d639-3270-4782-835e-4cf554d3281a" name="dt" type="Collection">
     <subsheetid>d605eebf-928a-4800-93e5-f4b29672661f</subsheetid>
@@ -723,6 +769,10 @@ dt = ExcelReader(filePath, use_column_data_type , use_header_row, sheetName: she
     <subsheetid>efde3c1c-bd1f-4be0-b2f9-3f57bd180bd0</subsheetid>
     <loginhibit />
     <display x="15" y="-105" />
+    <inputs>
+      <input type="number" name="Index" stage="I_numIndex" />
+      <input type="flag" name="Save?" stage="I_flagSave" />
+    </inputs>
     <onsuccess>6140e095-6b0d-4126-afeb-ebceff644b94</onsuccess>
   </stage>
   <stage stageid="bc473c7a-8150-4135-94e2-d70ea80520cc" name="End" type="End">
@@ -745,7 +795,7 @@ dt = ExcelReader(filePath, use_column_data_type , use_header_row, sheetName: she
     <subsheetid>10e1fd1c-0999-485f-85be-a6c1e281c2ba</subsheetid>
     <display x="-225" y="-15" />
     <datatype>text</datatype>
-    <initialvalue xml:space="preserve">C:\Users\gopal\Documents\Excel\Temp.xlsx</initialvalue>
+    <initialvalue />
     <private />
     <alwaysinit />
   </stage>
@@ -763,14 +813,6 @@ dt = ExcelReader(filePath, use_column_data_type , use_header_row, sheetName: she
     <subsheetid>50c74c59-b9ca-49ff-a7db-f29c1923e58d</subsheetid>
     <loginhibit />
     <display x="15" y="90" />
-  </stage>
-  <stage stageid="4e5403b1-b580-452f-9fd3-d3bcea16f1f0" name="I_txtfilePath" type="Data">
-    <subsheetid>d605eebf-928a-4800-93e5-f4b29672661f</subsheetid>
-    <display x="-225" y="-15" />
-    <datatype>text</datatype>
-    <initialvalue xml:space="preserve">C:\Users\gopal\Documents\Excel\Temp.xlsx</initialvalue>
-    <private />
-    <alwaysinit />
   </stage>
   <stage stageid="2ff82e9a-29b3-4f02-bd68-530e8342fd5a" name="Set Border" type="Code">
     <subsheetid>50c74c59-b9ca-49ff-a7db-f29c1923e58d</subsheetid>
@@ -881,6 +923,90 @@ switch (where)
     <display x="-225" y="-15" />
     <datatype>flag</datatype>
     <initialvalue>True</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="f5e3eeeb-6685-40b9-bd99-98dc33baaae7" name="I_numIndex" type="Data">
+    <subsheetid>d605eebf-928a-4800-93e5-f4b29672661f</subsheetid>
+    <display x="-165" y="30" />
+    <datatype>number</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="916cc7aa-b76e-4e3b-b98f-f5cfa2e299e8" name="Update Pivot Criteria" type="SubSheetInfo">
+    <subsheetid>95825834-839d-49b9-82af-094773fab01b</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="f284af34-ec03-4930-a5c9-a79c94d4546d" name="Start" type="Start">
+    <subsheetid>95825834-839d-49b9-82af-094773fab01b</subsheetid>
+    <loginhibit />
+    <display x="15" y="-105" />
+    <inputs>
+      <input type="number" name="Index" stage="I_numIndex" />
+      <input type="text" name="Sheet" stage="I_txtSheetName" />
+      <input type="text" name="PivotTable" stage="I_txtPivotTableName" />
+      <input type="text" name="PivotField" stage="I_txtPivotField" />
+      <input type="text" name="Criteria" stage="I_txtCriteria" />
+    </inputs>
+    <onsuccess>95285ec1-0e66-4c59-a14a-3ddf49f80956</onsuccess>
+  </stage>
+  <stage stageid="2449b099-aed7-4d94-baaf-66e118d089c0" name="End" type="End">
+    <subsheetid>95825834-839d-49b9-82af-094773fab01b</subsheetid>
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="95285ec1-0e66-4c59-a14a-3ddf49f80956" name="Update Pivot Criteria" type="Code">
+    <subsheetid>95825834-839d-49b9-82af-094773fab01b</subsheetid>
+    <loginhibit />
+    <display x="15" y="-15" />
+    <inputs>
+      <input type="number" name="index" expr="[I_numIndex]" />
+      <input type="text" name="sheetName" expr="[I_txtSheetName]" />
+      <input type="text" name="pivotTable" expr="[I_txtPivotTableName]" />
+      <input type="text" name="pivotField" expr="[I_txtPivotField]" />
+      <input type="text" name="criteria" expr="[I_txtCriteria]" />
+    </inputs>
+    <onsuccess>2449b099-aed7-4d94-baaf-66e118d089c0</onsuccess>
+    <code><![CDATA[UpdatePivotCriteria((int)index, sheetName, pivotTable, pivotField, criteria);]]></code>
+  </stage>
+  <stage stageid="91c4a02f-4b28-491c-aba6-f77d73c62ec4" name="I_txtSheetName" type="Data">
+    <subsheetid>95825834-839d-49b9-82af-094773fab01b</subsheetid>
+    <display x="-225" y="30" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="e687328e-23ba-44f2-9a24-5bbae9ac59fb" name="I_numIndex" type="Data">
+    <subsheetid>95825834-839d-49b9-82af-094773fab01b</subsheetid>
+    <display x="-225" y="-15" />
+    <datatype>number</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="2aaa2e34-5409-46b0-a5e3-10b703970905" name="I_txtPivotTableName" type="Data">
+    <subsheetid>95825834-839d-49b9-82af-094773fab01b</subsheetid>
+    <display x="-225" y="75" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="2ec3bcbc-150b-45ce-b6ee-150e9572e2dd" name="I_txtPivotField" type="Data">
+    <subsheetid>95825834-839d-49b9-82af-094773fab01b</subsheetid>
+    <display x="-225" y="120" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="d0d3764e-d8c7-4804-abf8-1a12c4296ce5" name="I_txtCriteria" type="Data">
+    <subsheetid>95825834-839d-49b9-82af-094773fab01b</subsheetid>
+    <display x="-225" y="165" />
+    <datatype>text</datatype>
+    <initialvalue />
     <private />
     <alwaysinit />
   </stage>

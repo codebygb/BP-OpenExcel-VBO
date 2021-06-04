@@ -1,4 +1,4 @@
-# OpenXML BP VBO
+# OpenExce; BP VBO
 
 ## Automate excel with Blue Prism without MS Office installed. Faster than the provided MS Excel VBO.
 
